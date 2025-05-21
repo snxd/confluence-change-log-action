@@ -1,4 +1,4 @@
-# Publish Confluence Change Log Action
+# Confluence Change Log Action
 
 Forked from [Gershon-A/publish-release-to-confluence](https://github.com/Gershon-A/publish-release-to-confluence)
 
@@ -28,8 +28,8 @@ To use this action in your GitHub workflow, add the following step:
   update-release-notes:
     runs-on: ubuntu-latest
     steps:
-      - name: Publish Release Notes to Confluence
-        uses: snxd/publish-release-to-confluence@main
+      - name: Publish release notes to Confluence
+        uses: snxd/confluence-change-log-action@main
         with:
           email: ${{ secrets.CONFLUENCE_EMAIL }}
           api_token: ${{ secrets.CONFLUENCE_API_TOKEN }}

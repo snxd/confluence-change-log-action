@@ -18,6 +18,6 @@ jobs:
           host: solidstatenetworks.jira.com
           space_key: ${{ secrets.CONFLUENCE_SPACE_KEY }}
           page_id: ${{ secrets.CONFLUENCE_PAGE_ID }}
-          title: publish-release-to-confluence Change Log
+          title: Test Change Log
           tag: 1.1.0
           repository: snxd/jira-version-action
