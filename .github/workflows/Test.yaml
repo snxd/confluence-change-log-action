@@ -1,6 +1,5 @@
 name: Test Action
-
-on: [pull_request]
+on: [pull_request, push, workflow_dispatch]
 
 jobs:
   test:
@@ -14,25 +13,11 @@ jobs:
         id: run_action
         uses: ./
         with:
-          spaceId: ${{ vars.SPACE_ID}}
-          status: 'current'
-          title: "Release: ${{ github.ref_name }}"
-          parentId: ${{ vars.PAGE_ID}}
-          ConfluenceBaseUrl: 'https://smart-cooking.atlassian.net'
-          tag: v1.0.0
-          confluence_email: ${{ vars.CONFLUENCE_EMAIL }}
-          confluence_api_token: ${{ secrets.CONFLUENCE_API_TOKEN }}
-          appName:   ${{ github.event.repository.name }}
-          repoOwner: ${{ github.repository_owner }}
-          repoName:  ${{ github.event.repository.name }}
-
-      - name: Clean up
-        id: cleanup
-        if: success()
-        run: |
-          # Retrieve the pageId output from the Run action step
-          pageId=${{ env.pageId }}
-          echo "Page ID: $pageId"
-          curl --request DELETE \
-          --url "https://smart-cooking.atlassian.net/wiki/api/v2/pages/$pageId" \
-          --user "${{ vars.CONFLUENCE_EMAIL }}:${{ secrets.CONFLUENCE_API_TOKEN }}"
+          email: ${{ secrets.CONFLUENCE_EMAIL }}
+          api_token: ${{ secrets.CONFLUENCE_API_TOKEN }}
+          host: solidstatenetworks.jira.com
+          space_key: ${{ secrets.CONFLUENCE_SPACE_KEY }}
+          page_id: ${{ secrets.CONFLUENCE_PAGE_ID }}
+          title: publish-release-to-confluence Change Log
+          tag: 1.1.0
+          repository: snxd/jira-version-action
