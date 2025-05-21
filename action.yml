@@ -101,7 +101,6 @@ runs:
         echo "nextVersion=$nextVersion" >> $GITHUB_ENV
 
     - name: Post Release Notes to Confluence
-      id: post_to_confluence
       shell: bash
       env:
         RELEASE_NOTES: ${{ fromJSON(steps.get-release.outputs.result).body }}
@@ -128,9 +127,6 @@ runs:
         # Convert markdown to HTML
         echo "${RELEASE_NOTES}" > release_notes.md
         pandoc -f markdown -t html release_notes.md -o release_notes.html
-
-        # Convert HTML links to Confluence storage format [text|url]
-        sed -i -E 's#<a href="([^"]+)"[^>]*>([^<]+)</a>#[\2|\1]#g' release_notes.html
 
         # Read the HTML content into a variable
         html_content=$(<release_notes.html)
