@@ -110,6 +110,7 @@ runs:
         RELEASE_NOTES="# [${{ inputs.tag }}](${RELEASE_URL})\n$(date)\n\n${RELEASE_NOTES}"
 
         # Reduce size of headings
+        RELEASE_NOTES=$(echo -e "${RELEASE_NOTES}" | sed 's/### /#### /g')
         RELEASE_NOTES=$(echo -e "${RELEASE_NOTES}" | sed 's/## /### /g')
 
         # Replace @username with a link to the user's GitHub profile
@@ -117,7 +118,7 @@ runs:
 
         # Convert bare PR links to [#number](url)
         RELEASE_NOTES=$(echo -e "${RELEASE_NOTES}" | sed -r 's@https://github.com/([^/]+)/([^/]+)/pull/([0-9]+)@[#\3](\0)@g')
-        
+
         # Convert bare full change log links to [url](url)
         RELEASE_NOTES=$(echo -e "${RELEASE_NOTES}" | sed -r 's@https://github.com/([^/]+)/([^/]+)/compare/([^/]+)@[\0](\0)@g')
 
