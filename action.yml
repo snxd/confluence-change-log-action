@@ -125,6 +125,9 @@ runs:
         # Convert Markdown links [text](url) to Confluence format [text|url]
         RELEASE_NOTES=$(echo -e "${RELEASE_NOTES}" | sed -r 's/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/[\1|\2]/g')
 
+        # Remove bold from 'Full Changelog' text
+        RELEASE_NOTES=$(echo -e "${RELEASE_NOTES}" | sed 's/\*\*Full Changelog\*\*/Full Changelog/g')
+
         # Convert markdown to HTML
         echo "${RELEASE_NOTES}" > release_notes.md
         pandoc -f markdown -t html release_notes.md -o release_notes.html
