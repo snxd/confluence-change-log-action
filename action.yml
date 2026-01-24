@@ -146,7 +146,7 @@ runs:
         fi
 
         # Prepare the payload
-        payload=$(jq -n \
+        jq -n \
         --arg spaceId "${{ env.spaceId }}" \
         --argjson pageId "${{ inputs.page_id }}" \
         --argjson version "${{ env.nextVersion }}" \
@@ -165,16 +165,16 @@ runs:
               "representation": "storage",
               "value": $value
             }
-        }'
-        )
+        }' > payload.json
 
-        echo "Payload: $payload"
+        echo "Payload: $(cat payload.json)"
         response=$(curl --request PUT \
             --url 'https://${{ inputs.host }}/wiki/api/v2/pages/${{ inputs.page_id }}' \
             --user '${{ inputs.email }}:${{ inputs.api_token }}' \
             --header 'Accept: application/json' \
             --header 'Content-Type: application/json' \
-            --data "$payload")
+            --data @payload.json)
+        rm -f payload.json
         echo "Response: $response"
         responseId=$(echo "$response" | jq -r '.id')
         echo "Response Page ID: $responseId"
