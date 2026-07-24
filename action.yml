@@ -66,13 +66,14 @@ runs:
       id: get-release
       uses: actions/github-script@v9
       with:
+        # Retry transient network and 5xx failures reaching the GitHub API.
+        retries: 3
         script: |
           const tag = '${{ inputs.tag }}';
           const [owner, repo] = '${{ inputs.repository }}'.split('/');
           const release = await github.rest.repos.getReleaseByTag({owner, repo, tag});
           if (!release || !release.data.body) {
-              console.error('Invalid release');
-              return;
+              throw new Error(`No release body found for tag ${tag}`);
           }
           console.log(release.data.body);
           return {
