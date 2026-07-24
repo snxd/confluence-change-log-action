@@ -10,15 +10,31 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Setup Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.x"
+
+      - name: Start mock Confluence server
+        run: |
+          python test/mock_confluence_server.py --port 8080 --space-key TEST --page-id 123456 &
+          for i in $(seq 1 10); do
+            if curl -sf http://localhost:8080/wiki/rest/api/space/TEST >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "Mock server did not start" && exit 1
+
       - name: Run action
         id: run_action
         uses: ./
         with:
-          email: ${{ secrets.CONFLUENCE_EMAIL }}
-          api_token: ${{ secrets.CONFLUENCE_API_TOKEN }}
-          host: solidstatenetworks.jira.com
-          space_key: ${{ secrets.CONFLUENCE_SPACE_KEY }}
-          page_id: ${{ secrets.CONFLUENCE_PAGE_ID }}
+          email: test@test.com
+          api_token: fake-token
+          host: http://localhost:8080
+          space_key: TEST
+          page_id: 123456
           title: Test Change Log
           tag: 1.1.0
           repository: snxd/jira-version-action

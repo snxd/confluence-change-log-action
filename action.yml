@@ -16,7 +16,7 @@ inputs:
     required: true
     type: string
   host:
-    description: Confluence host name
+    description: Confluence host name. May include a scheme; defaults to https.
     required: true
     type: string
   space_key:
@@ -47,6 +47,17 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Resolve Confluence base URL
+      shell: bash
+      run: |
+        # Prepend https when the host omits a scheme so bare hostnames keep working.
+        host='${{ inputs.host }}'
+        case "$host" in
+          http://*|https://*) ;;
+          *) host="https://$host" ;;
+        esac
+        echo "confluenceBaseUrl=$host" >> $GITHUB_ENV
+
     - name: Install markdown to HTML converter
       shell: bash
       run: sudo apt-get install -y pandoc
@@ -73,7 +84,7 @@ runs:
       shell: bash
       run: |
         response=$(curl --request GET \
-            --url "https://${{ inputs.host }}/wiki/rest/api/space/${{ inputs.space_key }}" \
+            --url "${{ env.confluenceBaseUrl }}/wiki/rest/api/space/${{ inputs.space_key }}" \
             --user '${{ inputs.email }}:${{ inputs.api_token }}' \
             --header 'Accept: application/json')
         echo "Response: $response"
@@ -88,7 +99,7 @@ runs:
       shell: bash
       run: |
         response=$(curl --request GET \
-            --url 'https://${{ inputs.host }}/wiki/api/v2/pages/${{ inputs.page_id }}' \
+            --url "${{ env.confluenceBaseUrl }}/wiki/api/v2/pages/${{ inputs.page_id }}" \
             --user '${{ inputs.email }}:${{ inputs.api_token }}' \
             --header 'Accept: application/json')
         echo "Response: $response"
@@ -136,7 +147,7 @@ runs:
         html_content=$(<release_notes.html)
 
         response=$(curl --request GET \
-            --url 'https://${{ inputs.host }}/wiki/rest/api/content/${{ inputs.page_id }}?expand=body.storage' \
+            --url "${{ env.confluenceBaseUrl }}/wiki/rest/api/content/${{ inputs.page_id }}?expand=body.storage" \
             --user '${{ inputs.email }}:${{ inputs.api_token }}' \
             --header 'Accept: application/json')
         echo "Response: $response"
@@ -169,7 +180,7 @@ runs:
 
         echo "Payload: $(cat payload.json)"
         response=$(curl --request PUT \
-            --url 'https://${{ inputs.host }}/wiki/api/v2/pages/${{ inputs.page_id }}' \
+            --url "${{ env.confluenceBaseUrl }}/wiki/api/v2/pages/${{ inputs.page_id }}" \
             --user '${{ inputs.email }}:${{ inputs.api_token }}' \
             --header 'Accept: application/json' \
             --header 'Content-Type: application/json' \
